@@ -1,48 +1,51 @@
+// Import package Flutter dan dua halaman yang dibuat (cuaca & gempa)
 import 'package:flutter/material.dart';
-import 'gempa.dart'; // Import halaman gempa
-import 'cuaca.dart'; // Import halaman cuaca
+import 'gempa.dart'; // Halaman data gempa
+import 'cuaca.dart'; // Halaman data cuaca
 
+// Fungsi utama yang menjalankan aplikasi
 void main() {
   runApp(BMKGApp());
 }
 
+// Widget utama aplikasi
 class BMKGApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'BMKG App',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark().copyWith(
-        scaffoldBackgroundColor: Colors.black,
-        primaryColor: Colors.blue,
+      debugShowCheckedModeBanner: false, // untuk menghilangkan banner debug di pojok kanan atas
+      theme: ThemeData.dark().copyWith( // mennggunakan tema gelap
+        scaffoldBackgroundColor: Colors.black, // Warna latar belakang utama
+        primaryColor: Colors.blue, // Warna utama aplikasi
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.blue[700],
-            foregroundColor: Colors.white,
+            backgroundColor: Colors.blue[700], // Warna tombol
+            foregroundColor: Colors.white,     // Warna teks tombol
             textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           ),
         ),
       ),
-      home: BMKGHomePage(),
+      home: BMKGHomePage(), // Halaman awal aplikasi
     );
   }
 }
 
+// Halaman beranda utama aplikasi BMKG
 class BMKGHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
+      body: SafeArea( 
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                // Judul halaman
                 Text(
                   '🌐 DATA BMKG',
                   style: TextStyle(
@@ -55,7 +58,7 @@ class BMKGHomePage extends StatelessWidget {
                 ),
                 SizedBox(height: 30),
 
-                // Card Info Cuaca
+                // Kartu Informasi Cuaca
                 Card(
                   color: Colors.grey[900],
                   shape: RoundedRectangleBorder(
@@ -83,6 +86,7 @@ class BMKGHomePage extends StatelessWidget {
                           style: TextStyle(color: Colors.white70),
                         ),
                         SizedBox(height: 15),
+                        // Tombol navigasi ke halaman cuaca
                         ElevatedButton(
                           onPressed: () {
                             Navigator.push(
@@ -99,7 +103,7 @@ class BMKGHomePage extends StatelessWidget {
 
                 SizedBox(height: 30),
 
-                // Card Info Gempa
+                // Kartu Informasi Gempa
                 Card(
                   color: Colors.grey[900],
                   shape: RoundedRectangleBorder(
@@ -127,6 +131,7 @@ class BMKGHomePage extends StatelessWidget {
                           style: TextStyle(color: Colors.white70),
                         ),
                         SizedBox(height: 15),
+                        // Tombol navigasi ke halaman gempa
                         ElevatedButton(
                           onPressed: () {
                             Navigator.push(

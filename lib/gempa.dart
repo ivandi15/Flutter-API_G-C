@@ -1,34 +1,39 @@
 // File: gempa.dart
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+// StatefulWidget untuk menampilkan data gempa
 class GempaPage extends StatefulWidget {
   @override
   _GempaPageState createState() => _GempaPageState();
 }
 
 class _GempaPageState extends State<GempaPage> {
-  List<dynamic> gempaList = [];
-  bool isLoading = true;
+  List<dynamic> gempaList = []; // Menyimpan daftar data gempa dari API
+  bool isLoading = true; // Status loading data
 
   @override
   void initState() {
     super.initState();
-    fetchGempaData();
+    fetchGempaData(); // Ambil data gempa saat halaman pertama kali dimuat
   }
 
+  // Fungsi untuk mengambil data gempa dari API BMKG
   Future<void> fetchGempaData() async {
     final url = Uri.parse('https://data.bmkg.go.id/DataMKG/TEWS/gempaterkini.json');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
+      // Jika berhasil, ambil data gempa dari response dan simpan ke gempaList
       final jsonData = json.decode(response.body);
       setState(() {
         gempaList = jsonData['Infogempa']['gempa'];
         isLoading = false;
       });
     } else {
+      // Jika gagal, tampilkan error
       setState(() {
         isLoading = false;
       });
@@ -36,6 +41,7 @@ class _GempaPageState extends State<GempaPage> {
     }
   }
 
+  // Fungsi untuk menentukan warna berdasarkan besarnya magnitudo
   Color getMagnitudeColor(double magnitude) {
     if (magnitude < 3.0) return Colors.white;
     if (magnitude < 4.0) return Color.fromARGB(255, 0, 255, 72);
@@ -44,6 +50,7 @@ class _GempaPageState extends State<GempaPage> {
     return Color.fromARGB(255, 255, 0, 0);
   }
 
+  // Widget untuk menampilkan legenda warna pada header
   Widget _buildLegendBox(String label, String skala, String range, Color bgColor, Color textColor) {
     return Container(
       width: 70,
@@ -65,6 +72,7 @@ class _GempaPageState extends State<GempaPage> {
     );
   }
 
+  // Widget header untuk judul dan keterangan data
   Widget buildHeader() {
     return Padding(
       padding: const EdgeInsets.all(20),
@@ -79,6 +87,7 @@ class _GempaPageState extends State<GempaPage> {
             style: TextStyle(fontSize: 16, color: Colors.white70),
           ),
           SizedBox(height: 20),
+          // warna berdasarkan skala gempa
           Wrap(
             spacing: 8,
             runSpacing: 8,
@@ -96,6 +105,7 @@ class _GempaPageState extends State<GempaPage> {
     );
   }
 
+  // Widget untuk menampilkan data gempa dalam bentuk card
   Widget buildGempaCard(dynamic gempa) {
     double magnitude = double.tryParse(gempa['Magnitude']) ?? 0.0;
 
@@ -116,6 +126,7 @@ class _GempaPageState extends State<GempaPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Lokasi wilayah gempa
           Row(
             children: [
               Icon(Icons.location_on_outlined, color: Colors.red),
@@ -131,6 +142,8 @@ class _GempaPageState extends State<GempaPage> {
           SizedBox(height: 8),
           Divider(thickness: 2, color: Colors.white30),
           SizedBox(height: 10),
+
+          // Magnitudo
           Row(
             children: [
               Icon(Icons.speed, size: 20, color: Colors.orange),
@@ -138,7 +151,7 @@ class _GempaPageState extends State<GempaPage> {
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: getMagnitudeColor(magnitude),
+                  color: getMagnitudeColor(magnitude), // Warna tergantung magnitude
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: RichText(
@@ -153,6 +166,8 @@ class _GempaPageState extends State<GempaPage> {
             ],
           ),
           SizedBox(height: 6),
+
+          // Kedalaman gempa
           Row(
             children: [
               Icon(Icons.vertical_align_bottom, size: 20, color: Colors.lightBlueAccent),
@@ -168,6 +183,8 @@ class _GempaPageState extends State<GempaPage> {
             ],
           ),
           SizedBox(height: 6),
+
+          // Waktu kejadian
           Row(
             children: [
               Icon(Icons.access_time_rounded, size: 20, color: Colors.lightGreenAccent),
@@ -187,6 +204,7 @@ class _GempaPageState extends State<GempaPage> {
     );
   }
 
+  // Build utama halaman
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -196,17 +214,19 @@ class _GempaPageState extends State<GempaPage> {
         title: Text('Data Gempa Terkini'),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Navigator.pop(context), // Kembali ke halaman sebelumnya
         ),
       ),
       body: isLoading
+          // data sedang dimuat
           ? Center(child: CircularProgressIndicator())
+          // sudah selesai, menampilkan list data
           : RefreshIndicator(
-              onRefresh: fetchGempaData,
+              onRefresh: fetchGempaData, // Tarik ke bawah untuk refresh
               child: ListView(
                 children: [
-                  buildHeader(),
-                  ...gempaList.map((g) => buildGempaCard(g)).toList(),
+                  buildHeader(), // Tampilkan header
+                  ...gempaList.map((g) => buildGempaCard(g)).toList(), // Tampilkan setiap data gempa
                   SizedBox(height: 30),
                 ],
               ),

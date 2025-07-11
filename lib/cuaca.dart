@@ -1,47 +1,54 @@
+// Import library Flutter, HTTP, dan XML parser
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:xml/xml.dart' as xml;
 
+// Halaman utama CuacaPage yang menggunakan StatefulWidget
 class CuacaPage extends StatefulWidget {
   @override
   _CuacaPageState createState() => _CuacaPageState();
 }
 
 class _CuacaPageState extends State<CuacaPage> {
-  List<Map<String, String>> cuacaList = [];
-  bool isLoading = true;
+  List<Map<String, String>> cuacaList = []; // Menyimpan data cuaca
+  bool isLoading = true; // Status untuk loading spinner
 
   @override
   void initState() {
     super.initState();
-    fetchCuacaData();
+    fetchCuacaData(); // Ambil data saat halaman pertama kali dibuka
   }
 
+  // Fungsi untuk mengambil data XML dari BMKG dan parsing
   Future<void> fetchCuacaData() async {
     final url = Uri.parse('https://data.bmkg.go.id/DataMKG/MEWS/DigitalForecast/DigitalForecast-Indonesia.xml');
 
     try {
-      final response = await http.get(url);
+      final response = await http.get(url); // Kirim permintaan HTTP
       if (response.statusCode == 200) {
-        final document = xml.XmlDocument.parse(response.body);
-        final areaList = document.findAllElements('area');
+        final document = xml.XmlDocument.parse(response.body); // Parsing XML
+        final areaList = document.findAllElements('area'); // Ambil semua elemen area
 
         List<Map<String, String>> dataList = [];
 
+        // Loop untuk setiap wilayah area
         for (var area in areaList) {
           String name = area.getAttribute('description') ?? 'Wilayah Tidak Diketahui';
 
+          // Cari parameter cuaca (weather)
           var weatherElement = area.findElements('parameter').firstWhere(
             (e) => e.getAttribute('id') == 'weather',
             orElse: () => xml.XmlElement(xml.XmlName('empty')),
           );
 
+          // Jika parameter cuaca ditemukan
           if (weatherElement.name.local != 'empty') {
             var weatherValues = weatherElement.findAllElements('value').toList();
             if (weatherValues.isNotEmpty) {
               String weatherCode = weatherValues.first.text;
-              String weatherDesc = getWeatherDescription(weatherCode);
+              String weatherDesc = getWeatherDescription(weatherCode); // Dapatkan deskripsi cuaca
 
+              // Simpan data wilayah dan cuacanya
               dataList.add({
                 'wilayah': name,
                 'cuaca': weatherDesc,
@@ -51,6 +58,7 @@ class _CuacaPageState extends State<CuacaPage> {
           }
         }
 
+        // Update UI
         setState(() {
           cuacaList = dataList;
           isLoading = false;
@@ -66,6 +74,7 @@ class _CuacaPageState extends State<CuacaPage> {
     }
   }
 
+  // Fungsi untuk mengubah kode cuaca menjadi deskripsi
   String getWeatherDescription(String code) {
     switch (code) {
       case '0': return 'Cerah';
@@ -81,6 +90,7 @@ class _CuacaPageState extends State<CuacaPage> {
     }
   }
 
+  // Fungsi untuk menampilkan ikon sesuai kode cuaca
   IconData getWeatherIcon(String code) {
     switch (code) {
       case '0': return Icons.wb_sunny;
@@ -96,9 +106,10 @@ class _CuacaPageState extends State<CuacaPage> {
     }
   }
 
+  // Fungsi untuk membangun 1 card cuaca
   Widget buildCuacaCard(Map<String, String> data) {
     final weatherCode = data['kode'] ?? '';
-    final icon = getWeatherIcon(weatherCode);
+    final icon = getWeatherIcon(weatherCode); // Ikon sesuai kode cuaca
 
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -120,7 +131,7 @@ class _CuacaPageState extends State<CuacaPage> {
       ),
       child: Row(
         children: [
-          Icon(icon, size: 40, color: Colors.amberAccent),
+          Icon(icon, size: 40, color: Colors.amberAccent), // Ikon cuaca
           SizedBox(width: 16),
           Expanded(
             child: Column(
@@ -143,6 +154,7 @@ class _CuacaPageState extends State<CuacaPage> {
     );
   }
 
+  // Fungsi utama build UI
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -163,13 +175,14 @@ class _CuacaPageState extends State<CuacaPage> {
           ),
         ),
         child: isLoading
-            ? Center(child: CircularProgressIndicator(color: Colors.white))
+            ? Center(child: CircularProgressIndicator(color: Colors.white)) // Loading spinner
             : RefreshIndicator(
                 color: Colors.white,
                 backgroundColor: Colors.blueGrey,
-                onRefresh: fetchCuacaData,
+                onRefresh: fetchCuacaData, // Pull to refresh
                 child: ListView(
                   children: [
+                    // Header cuaca
                     Padding(
                       padding: const EdgeInsets.only(top: 60.0, bottom: 16),
                       child: Column(
@@ -188,6 +201,7 @@ class _CuacaPageState extends State<CuacaPage> {
                         ],
                       ),
                     ),
+                    // List semua card cuaca
                     ...cuacaList.map((item) => buildCuacaCard(item)).toList(),
                     SizedBox(height: 30),
                   ],
