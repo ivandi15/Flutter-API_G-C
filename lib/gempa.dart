@@ -190,7 +190,15 @@ class _GempaPageState extends State<GempaPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black, // Tambahkan baris ini
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.blue[900],
+        title: Text('Data Gempa Terkini'),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
           : RefreshIndicator(

@@ -146,6 +146,14 @@ class _CuacaPageState extends State<CuacaPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.blue[900],
+        title: Text('Data Cuaca Indonesia'),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
